@@ -25,7 +25,7 @@ declare module puremvc
 		removeProxy( proxyName:string ):IProxy;
         hasProxy(proxyName: string): boolean;
 		registerMediator( mediator:IMediator ):void;
-		retrieveMediator( mediatorName:string ):IMediator;
+		retrieveMediator( mediatorName:string ):any;
 		removeMediator( mediatorName:string ):IMediator;
         hasMediator(mediatorName: string): boolean;
 		notifyObservers( notification:INotification ):void;
@@ -194,7 +194,7 @@ declare module puremvc
         public removeProxy(proxyName: string): IProxy;
         public hasProxy(proxyName: string): boolean;
         public registerMediator(mediator: IMediator): void;
-        public retrieveMediator(mediatorName: string): IMediator;
+        public retrieveMediator(mediatorName: string): any;
         public removeMediator(mediatorName: string): IMediator;
         public hasMediator(mediatorName: string): boolean;
         public notifyObservers(notification: INotification): void;
