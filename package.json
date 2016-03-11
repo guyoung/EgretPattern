@@ -4,7 +4,7 @@
   "description": "Egret 应用开发",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "http-server -p 8000"
   },
   "repository": {
     "type": "git",

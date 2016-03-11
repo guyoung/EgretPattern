@@ -2,6 +2,7 @@
 /// <reference path="../../../libs/egret/build/tween/tween.d.ts"/>
 /// <reference path="../../../libs/egret//build/res/res.d.ts"/>
 
+
 class App extends egret.DisplayObjectContainer {
 
     public constructor() {

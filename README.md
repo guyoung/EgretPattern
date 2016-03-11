@@ -2,12 +2,28 @@ GyEgretPattern
 ==============
 Egret应用开发实践
 
-## Getting Started
+## 使用
 
- 1. Clone repo
- 2. npm install
- 3. npm start
+### 安装依赖包 
 
+    npm install
+
+### 编译应用
+
+在应用目录下，如apps/app_01_hello_world，执行
+
+     ..\..\node_modules\.bin\webpack
+
+### 运行
+
+在项目目录下，执行
+
+    npm run start
+
+
+
+
+------------------------------------------------
 
 **Guyoung Studio**
  + Official Site: <a href="http://www.guyoung.net/" target="_blank">www.guyoung.net</a>
