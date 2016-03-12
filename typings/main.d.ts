@@ -4,3 +4,4 @@
 /// <reference path="../libs/egret/build/eui/eui.d.ts"/>
 
 /// <reference path="../libs/puremvc/puremvc.d.ts"/>
+/// <reference path="../libs/puremvc/puremvc-statemachine.d.ts"/>

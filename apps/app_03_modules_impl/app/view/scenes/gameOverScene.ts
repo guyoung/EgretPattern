@@ -17,7 +17,7 @@ export class GameOverScene extends egret.Sprite {
     private init() {
 
         var text = new egret.TextField();
-        text.text = 'Game Over';
+        text.text = ' Game Over Scene ';
         text.width = 400;
         text.height = 300;
         text.x = (this.width - text.width) * 0.5;
@@ -26,7 +26,7 @@ export class GameOverScene extends egret.Sprite {
 
 
         var btn = new egret.TextField();
-        btn.text = '退出';
+        btn.text = 'EXIT';
         btn.x = this.width - 20 - btn.width;
         btn.y = this.height - 20 - btn.height;
         btn.touchEnabled = true;

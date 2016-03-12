@@ -12,25 +12,28 @@ export class DirectorMediator extends puremvc.Mediator {
 
 	/** @override */
 	public listNotificationInterests(): string[] {
-		return ['CHANGE_SCENE'];
+		return [
+			puremvc.statemachine.StateMachine.CHANGED
+		];
 	}
 
 	public handleNotification(notification: puremvc.INotification): void {
 		switch (notification.getName()) {
-			case 'CHANGE_SCENE':
-				//alert('CHANGE_SCENE');
-				//alert(notification.getBody());
-				this.changeScene(notification.getBody());
-
+			case puremvc.statemachine.StateMachine.CHANGED:				
+				this.changeScene(notification.getBody().name);
 				break;
 		}
 
 	}
 
 	public onRegister(): void {
-		var sprite = new egret.Sprite();
+		this.viewComponent = new egret.Sprite();
+		this.viewComponent.width = this.facade.container.stage.stageWidth;
+		this.viewComponent.height = this.facade.container.stage.stageHeight;
 
-		this.setViewComponent(sprite);
+		if (this.facade.container) {
+			this.facade.container.addChild(this.viewComponent);
+		}
 	}
 
 	public onRemove(): void {
@@ -38,6 +41,8 @@ export class DirectorMediator extends puremvc.Mediator {
 	}
 
 	public changeScene(mediatorName): void {
+
+		//alert('changeScene:' + mediatorName)
 
 		if (this._activeSceneMediator) {
 			this.getViewComponent().removeChildren();
@@ -49,10 +54,10 @@ export class DirectorMediator extends puremvc.Mediator {
 
 		if (sceneMediator) {			
 			this._activeSceneMediator = sceneMediator;
-			sceneMediator.renderScene(this.getViewComponent().width,
-				this.getViewComponent().height);	
+			sceneMediator.renderScene(this.viewComponent.width,
+				this.viewComponent.height);	
 
-			this.getViewComponent().addChild(sceneMediator.getViewComponent());
+			this.viewComponent.addChild(sceneMediator.getViewComponent());
 		}
 	}
 

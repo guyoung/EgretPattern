@@ -1,9 +1,10 @@
 ///<reference path="../../../../../typings/main.d.ts"/>
 
+import {SceneAction} from '../../scheme/sceneAction';
 
 export class GameMainScene extends egret.Sprite {
 
-    public onchange: any;
+    public onAction: any;
     public onKill: any;
     private _lifeText: egret.TextField;
 
@@ -49,8 +50,8 @@ export class GameMainScene extends egret.Sprite {
         btn.touchEnabled = true;
         this.addChild(btn);
         btn.addEventListener(egret.TouchEvent.TOUCH_TAP, function(e: egret.TouchEvent) {
-            if (this.onKill) {
-                this.onchange('Menu');
+            if (this.onAction) {
+                this.onAction(SceneAction.HOME_ACTION);
             }
         }, this);
     }

@@ -1,10 +1,11 @@
 ///<reference path="../../../../../typings/main.d.ts"/>
 
+import {SceneAction} from '../../scheme/sceneAction';
 
 export class OptionScene extends egret.Sprite {
 
-    public onchange: any;
-
+    public onAction: any;
+    
     public constructor(width: number, height: number) {
         super();
 
@@ -28,8 +29,8 @@ export class OptionScene extends egret.Sprite {
         btn.touchEnabled = true;
         this.addChild(btn);
         btn.addEventListener(egret.TouchEvent.TOUCH_TAP, function(e: egret.TouchEvent) {
-            if (this.onchange) {
-                this.onchange('Menu');
+            if (this.onAction) {
+                this.onAction(SceneAction.HOME_ACTION);
             }
         }, this);
     }

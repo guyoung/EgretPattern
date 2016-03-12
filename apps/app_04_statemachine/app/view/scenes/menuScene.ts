@@ -1,9 +1,10 @@
 ///<reference path="../../../../../typings/main.d.ts"/>
 
+import {SceneAction} from '../../scheme/sceneAction';
 
 export class MenuScene extends egret.Sprite {
 
-    public onchange: any;
+    public onAction: any;
 
     public constructor(width: number, height: number) {
         super();
@@ -22,8 +23,8 @@ export class MenuScene extends egret.Sprite {
         btn.touchEnabled = true;       
         this.addChild(btn);
         btn.addEventListener(egret.TouchEvent.TOUCH_TAP, function(e: egret.TouchEvent) {
-            if (this.onchange) {
-                this.onchange('GameMain');
+            if (this.onAction) {
+                this.onAction(SceneAction.GAME_MAIN_ACTION);
             }
         }, this);
         
@@ -34,8 +35,8 @@ export class MenuScene extends egret.Sprite {
         btn.y = 250;
         btn.touchEnabled = true;  
         btn.addEventListener(egret.TouchEvent.TOUCH_TAP, function(e: egret.TouchEvent) {
-            if (this.onchange) {
-                this.onchange('Option');
+            if (this.onAction) {
+                this.onAction(SceneAction.OPTION_ACTION);
             }
         }, this);
         this.addChild(btn);
@@ -46,7 +47,9 @@ export class MenuScene extends egret.Sprite {
         btn.y = 300;
         btn.touchEnabled = true;  
         btn.addEventListener(egret.TouchEvent.TOUCH_TAP, function(e: egret.TouchEvent) {
-            this.onchange('Help');
+            if (this.onAction) {
+                this.onAction(SceneAction.HELP_ACTION);
+            }
         }, this);
         this.addChild(btn);
     }

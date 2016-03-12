@@ -63,6 +63,7 @@ declare module puremvc
 
 	export interface INotifier
 	{
+        multitonKey: string;
 		sendNotification( name:string, body?:any, type?:string ):void;
 	}
 
@@ -181,6 +182,7 @@ declare module puremvc
         public model: IModel;
         public view: IView;
         public controller: IController;
+        public multitonKey: string;
         constructor (key);
         public initializeFacade(): void;
         public initializeModel(): void;
@@ -209,9 +211,12 @@ declare module puremvc
     export class Notifier
 		implements INotifier
 	{
-        public facade: IFacade;
+        public facade: any;
+        public multitonKey: string;
         constructor ();
         public sendNotification(name: string, body?: any, type?: string): void;
+
+        public initializeNotifier(key)
     }
 
     export class MacroCommand

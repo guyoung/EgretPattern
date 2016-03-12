@@ -74,13 +74,8 @@
 	     */
 	    App.prototype.createGameScene = function () {
 	        var key = 'GY_EGRET_PATTERN';
-	        var stageWidth = this.stage.stageWidth;
-	        var stageHeight = this.stage.stageHeight;
 	        var appFacade = appFacade_1.AppFacade.getInstance(key);
-	        var director = appFacade.getDirector();
-	        director.width = stageWidth;
-	        director.height = stageHeight;
-	        this.addChild(director);
+	        appFacade.container = this;
 	        appFacade.startup();
 	    };
 	    return App;
@@ -101,11 +96,11 @@
 	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 	};
 	var startupCommand_1 = __webpack_require__(3);
-	var DirectorMediator_1 = __webpack_require__(23);
 	var AppFacade = (function (_super) {
 	    __extends(AppFacade, _super);
 	    function AppFacade(key) {
 	        _super.call(this, key);
+	        this.container = null;
 	    }
 	    AppFacade.prototype.initializeController = function () {
 	        puremvc.Facade.prototype.initializeController.call(this);
@@ -116,17 +111,9 @@
 	    };
 	    AppFacade.prototype.initializeView = function () {
 	        puremvc.Facade.prototype.initializeView.call(this);
-	        this.registerMediator(new DirectorMediator_1.DirectorMediator());
-	    };
-	    AppFacade.prototype.getDirector = function () {
-	        if (this.hasMediator(AppFacade.DIRECTOR_MEDIATOR)) {
-	            var directorMediator = this.retrieveMediator(AppFacade.DIRECTOR_MEDIATOR);
-	            return directorMediator.getViewComponent();
-	        }
 	    };
 	    AppFacade.prototype.startup = function () {
 	        this.sendNotification(AppFacade.STARTUP_COMMAND);
-	        this.sendNotification('Menu');
 	    };
 	    AppFacade.getInstance = function (key) {
 	        var instanceMap = puremvc.Facade.instanceMap;
@@ -137,7 +124,6 @@
 	        return instanceMap[key] = new AppFacade(key);
 	    };
 	    AppFacade.STARTUP_COMMAND = 'STARTUP';
-	    AppFacade.DIRECTOR_MEDIATOR = 'DIRECTOR_MEDIATOR';
 	    return AppFacade;
 	}(puremvc.Facade));
 	exports.AppFacade = AppFacade;
@@ -155,8 +141,8 @@
 	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 	};
 	var prepModelCommand_1 = __webpack_require__(4);
-	var prepViewCommand_1 = __webpack_require__(6);
-	var prepControllerCommand_1 = __webpack_require__(17);
+	var prepViewCommand_1 = __webpack_require__(7);
+	var prepControllerCommand_1 = __webpack_require__(19);
 	var StartupCommand = (function (_super) {
 	    __extends(StartupCommand, _super);
 	    function StartupCommand() {
@@ -201,7 +187,7 @@
 
 /***/ },
 /* 5 */
-/***/ function(module, exports) {
+/***/ function(module, exports, __webpack_require__) {
 
 	///<reference path="../../../../../typings/main.d.ts"/>
 	"use strict";
@@ -210,6 +196,7 @@
 	    function __() { this.constructor = d; }
 	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 	};
+	var sceneAction_1 = __webpack_require__(6);
 	var GameProxy = (function (_super) {
 	    __extends(GameProxy, _super);
 	    function GameProxy() {
@@ -231,7 +218,7 @@
 	    GameProxy.prototype.decLife = function (cb) {
 	        this._life--;
 	        if (this._life <= 0) {
-	            this.sendNotification('GameOver');
+	            this.sendNotification(puremvc.statemachine.StateMachine.ACTION, null, sceneAction_1.SceneAction.GAME_OVER_ACTION);
 	        }
 	        else {
 	            if (cb) {
@@ -247,36 +234,20 @@
 
 /***/ },
 /* 6 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ function(module, exports) {
 
-	///<reference path="../../../../../typings/main.d.ts"/>
 	"use strict";
-	var __extends = (this && this.__extends) || function (d, b) {
-	    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-	    function __() { this.constructor = d; }
-	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-	};
-	var menuSceneMediator_1 = __webpack_require__(7);
-	var gameMainSceneMediator_1 = __webpack_require__(9);
-	var gameOverSceneMediator_1 = __webpack_require__(11);
-	var optionSceneMediator_1 = __webpack_require__(13);
-	var helpSceneMediator_1 = __webpack_require__(15);
-	var PrepViewCommand = (function (_super) {
-	    __extends(PrepViewCommand, _super);
-	    function PrepViewCommand() {
-	        _super.call(this);
+	var SceneAction = (function () {
+	    function SceneAction() {
 	    }
-	    PrepViewCommand.prototype.execute = function (notification) {
-	        this.facade.registerMediator(new menuSceneMediator_1.MenuSceneMediator());
-	        this.facade.registerMediator(new gameMainSceneMediator_1.GameMainSceneMediator());
-	        this.facade.registerMediator(new gameOverSceneMediator_1.GameOverSceneMediator());
-	        this.facade.registerMediator(new optionSceneMediator_1.OptionSceneMediator());
-	        this.facade.registerMediator(new helpSceneMediator_1.HelpSceneMediator());
-	    };
-	    PrepViewCommand.NAME = 'PREP_VIEW_COMMAND';
-	    return PrepViewCommand;
-	}(puremvc.SimpleCommand));
-	exports.PrepViewCommand = PrepViewCommand;
+	    SceneAction.HOME_ACTION = 'HOME_ACTION';
+	    SceneAction.GAME_MAIN_ACTION = 'GAME_MAIN_ACTION';
+	    SceneAction.GAME_OVER_ACTION = 'GAME_OVER_ACTION';
+	    SceneAction.OPTION_ACTION = 'OPTION_ACTION';
+	    SceneAction.HELP_ACTION = 'HELP_ACTION';
+	    return SceneAction;
+	}());
+	exports.SceneAction = SceneAction;
 
 
 /***/ },
@@ -290,7 +261,101 @@
 	    function __() { this.constructor = d; }
 	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 	};
-	var menuScene_1 = __webpack_require__(8);
+	var directorMediator_1 = __webpack_require__(8);
+	var menuSceneMediator_1 = __webpack_require__(9);
+	var gameMainSceneMediator_1 = __webpack_require__(11);
+	var gameOverSceneMediator_1 = __webpack_require__(13);
+	var optionSceneMediator_1 = __webpack_require__(15);
+	var helpSceneMediator_1 = __webpack_require__(17);
+	var PrepViewCommand = (function (_super) {
+	    __extends(PrepViewCommand, _super);
+	    function PrepViewCommand() {
+	        _super.call(this);
+	    }
+	    PrepViewCommand.prototype.execute = function (notification) {
+	        this.facade.registerMediator(new directorMediator_1.DirectorMediator());
+	        this.facade.registerMediator(new menuSceneMediator_1.MenuSceneMediator());
+	        this.facade.registerMediator(new gameMainSceneMediator_1.GameMainSceneMediator());
+	        this.facade.registerMediator(new gameOverSceneMediator_1.GameOverSceneMediator());
+	        this.facade.registerMediator(new optionSceneMediator_1.OptionSceneMediator());
+	        this.facade.registerMediator(new helpSceneMediator_1.HelpSceneMediator());
+	    };
+	    PrepViewCommand.NAME = 'PREP_VIEW_COMMAND';
+	    return PrepViewCommand;
+	}(puremvc.SimpleCommand));
+	exports.PrepViewCommand = PrepViewCommand;
+
+
+/***/ },
+/* 8 */
+/***/ function(module, exports) {
+
+	///<reference path="../../../../../typings/main.d.ts"/>
+	"use strict";
+	var __extends = (this && this.__extends) || function (d, b) {
+	    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+	    function __() { this.constructor = d; }
+	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+	};
+	var DirectorMediator = (function (_super) {
+	    __extends(DirectorMediator, _super);
+	    function DirectorMediator() {
+	        _super.call(this, DirectorMediator.NAME);
+	    }
+	    /** @override */
+	    DirectorMediator.prototype.listNotificationInterests = function () {
+	        return [
+	            puremvc.statemachine.StateMachine.CHANGED
+	        ];
+	    };
+	    DirectorMediator.prototype.handleNotification = function (notification) {
+	        switch (notification.getName()) {
+	            case puremvc.statemachine.StateMachine.CHANGED:
+	                this.changeScene(notification.getBody().name);
+	                break;
+	        }
+	    };
+	    DirectorMediator.prototype.onRegister = function () {
+	        this.viewComponent = new egret.Sprite();
+	        this.viewComponent.width = this.facade.container.stage.stageWidth;
+	        this.viewComponent.height = this.facade.container.stage.stageHeight;
+	        if (this.facade.container) {
+	            this.facade.container.addChild(this.viewComponent);
+	        }
+	    };
+	    DirectorMediator.prototype.onRemove = function () {
+	    };
+	    DirectorMediator.prototype.changeScene = function (mediatorName) {
+	        //alert('changeScene:' + mediatorName)
+	        if (this._activeSceneMediator) {
+	            this.getViewComponent().removeChildren();
+	            this._activeSceneMediator.destroyScene();
+	        }
+	        var sceneMediator = this.facade.retrieveMediator(mediatorName);
+	        if (sceneMediator) {
+	            this._activeSceneMediator = sceneMediator;
+	            sceneMediator.renderScene(this.viewComponent.width, this.viewComponent.height);
+	            this.viewComponent.addChild(sceneMediator.getViewComponent());
+	        }
+	    };
+	    DirectorMediator.NAME = 'DIRECTOR_MEDIATOR';
+	    return DirectorMediator;
+	}(puremvc.Mediator));
+	exports.DirectorMediator = DirectorMediator;
+
+
+/***/ },
+/* 9 */
+/***/ function(module, exports, __webpack_require__) {
+
+	///<reference path="../../../../../typings/main.d.ts"/>
+	"use strict";
+	var __extends = (this && this.__extends) || function (d, b) {
+	    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+	    function __() { this.constructor = d; }
+	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+	};
+	var menuScene_1 = __webpack_require__(10);
 	var MenuSceneMediator = (function (_super) {
 	    __extends(MenuSceneMediator, _super);
 	    function MenuSceneMediator() {
@@ -309,8 +374,8 @@
 	    MenuSceneMediator.prototype.renderScene = function (width, height) {
 	        var self = this;
 	        self.viewComponent = new menuScene_1.MenuScene(width, height);
-	        self.viewComponent.onchange = function (e) {
-	            self.sendNotification(e);
+	        self.viewComponent.onAction = function (action) {
+	            self.sendNotification(puremvc.statemachine.StateMachine.ACTION, null, action);
 	        };
 	    };
 	    MenuSceneMediator.prototype.destroyScene = function () {
@@ -323,8 +388,8 @@
 
 
 /***/ },
-/* 8 */
-/***/ function(module, exports) {
+/* 10 */
+/***/ function(module, exports, __webpack_require__) {
 
 	///<reference path="../../../../../typings/main.d.ts"/>
 	"use strict";
@@ -333,6 +398,7 @@
 	    function __() { this.constructor = d; }
 	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 	};
+	var sceneAction_1 = __webpack_require__(6);
 	var MenuScene = (function (_super) {
 	    __extends(MenuScene, _super);
 	    function MenuScene(width, height) {
@@ -349,8 +415,8 @@
 	        btn.touchEnabled = true;
 	        this.addChild(btn);
 	        btn.addEventListener(egret.TouchEvent.TOUCH_TAP, function (e) {
-	            if (this.onchange) {
-	                this.onchange('GameMain');
+	            if (this.onAction) {
+	                this.onAction(sceneAction_1.SceneAction.GAME_MAIN_ACTION);
 	            }
 	        }, this);
 	        btn = new egret.TextField();
@@ -359,8 +425,8 @@
 	        btn.y = 250;
 	        btn.touchEnabled = true;
 	        btn.addEventListener(egret.TouchEvent.TOUCH_TAP, function (e) {
-	            if (this.onchange) {
-	                this.onchange('Option');
+	            if (this.onAction) {
+	                this.onAction(sceneAction_1.SceneAction.OPTION_ACTION);
 	            }
 	        }, this);
 	        this.addChild(btn);
@@ -370,7 +436,9 @@
 	        btn.y = 300;
 	        btn.touchEnabled = true;
 	        btn.addEventListener(egret.TouchEvent.TOUCH_TAP, function (e) {
-	            this.onchange('Help');
+	            if (this.onAction) {
+	                this.onAction(sceneAction_1.SceneAction.HELP_ACTION);
+	            }
 	        }, this);
 	        this.addChild(btn);
 	    };
@@ -380,7 +448,7 @@
 
 
 /***/ },
-/* 9 */
+/* 11 */
 /***/ function(module, exports, __webpack_require__) {
 
 	///<reference path="../../../../../typings/main.d.ts"/>
@@ -390,7 +458,7 @@
 	    function __() { this.constructor = d; }
 	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 	};
-	var gameMainScene_1 = __webpack_require__(10);
+	var gameMainScene_1 = __webpack_require__(12);
 	var gameProxy_1 = __webpack_require__(5);
 	var GameMainSceneMediator = (function (_super) {
 	    __extends(GameMainSceneMediator, _super);
@@ -411,8 +479,8 @@
 	    GameMainSceneMediator.prototype.renderScene = function (width, height) {
 	        var self = this;
 	        self.viewComponent = new gameMainScene_1.GameMainScene(width, height);
-	        self.viewComponent.onchange = function (e) {
-	            self.sendNotification(e);
+	        self.viewComponent.onAction = function (action) {
+	            self.sendNotification(puremvc.statemachine.StateMachine.ACTION, null, action);
 	        };
 	        self.viewComponent.life = self._gameProxy.getLife();
 	        self.viewComponent.onKill = function () {
@@ -432,8 +500,8 @@
 
 
 /***/ },
-/* 10 */
-/***/ function(module, exports) {
+/* 12 */
+/***/ function(module, exports, __webpack_require__) {
 
 	///<reference path="../../../../../typings/main.d.ts"/>
 	"use strict";
@@ -442,6 +510,7 @@
 	    function __() { this.constructor = d; }
 	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 	};
+	var sceneAction_1 = __webpack_require__(6);
 	var GameMainScene = (function (_super) {
 	    __extends(GameMainScene, _super);
 	    function GameMainScene(width, height) {
@@ -479,8 +548,8 @@
 	        btn.touchEnabled = true;
 	        this.addChild(btn);
 	        btn.addEventListener(egret.TouchEvent.TOUCH_TAP, function (e) {
-	            if (this.onKill) {
-	                this.onchange('Menu');
+	            if (this.onAction) {
+	                this.onAction(sceneAction_1.SceneAction.HOME_ACTION);
 	            }
 	        }, this);
 	    };
@@ -493,7 +562,7 @@
 
 
 /***/ },
-/* 11 */
+/* 13 */
 /***/ function(module, exports, __webpack_require__) {
 
 	///<reference path="../../../../../typings/main.d.ts"/>
@@ -503,7 +572,7 @@
 	    function __() { this.constructor = d; }
 	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 	};
-	var gameOverScene_1 = __webpack_require__(12);
+	var gameOverScene_1 = __webpack_require__(14);
 	var GameOverSceneMediator = (function (_super) {
 	    __extends(GameOverSceneMediator, _super);
 	    function GameOverSceneMediator() {
@@ -522,8 +591,8 @@
 	    GameOverSceneMediator.prototype.renderScene = function (width, height) {
 	        var self = this;
 	        self.viewComponent = new gameOverScene_1.GameOverScene(width, height);
-	        self.viewComponent.onchange = function (e) {
-	            self.sendNotification(e);
+	        self.viewComponent.onAction = function (action) {
+	            self.sendNotification(puremvc.statemachine.StateMachine.ACTION, null, action);
 	        };
 	    };
 	    GameOverSceneMediator.prototype.destroyScene = function () {
@@ -536,8 +605,8 @@
 
 
 /***/ },
-/* 12 */
-/***/ function(module, exports) {
+/* 14 */
+/***/ function(module, exports, __webpack_require__) {
 
 	///<reference path="../../../../../typings/main.d.ts"/>
 	"use strict";
@@ -546,6 +615,7 @@
 	    function __() { this.constructor = d; }
 	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 	};
+	var sceneAction_1 = __webpack_require__(6);
 	var GameOverScene = (function (_super) {
 	    __extends(GameOverScene, _super);
 	    function GameOverScene(width, height) {
@@ -569,8 +639,8 @@
 	        btn.touchEnabled = true;
 	        this.addChild(btn);
 	        btn.addEventListener(egret.TouchEvent.TOUCH_TAP, function (e) {
-	            if (this.onchange) {
-	                this.onchange('Menu');
+	            if (this.onAction) {
+	                this.onAction(sceneAction_1.SceneAction.HOME_ACTION);
 	            }
 	        }, this);
 	    };
@@ -580,7 +650,7 @@
 
 
 /***/ },
-/* 13 */
+/* 15 */
 /***/ function(module, exports, __webpack_require__) {
 
 	///<reference path="../../../../../typings/main.d.ts"/>
@@ -590,7 +660,7 @@
 	    function __() { this.constructor = d; }
 	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 	};
-	var optionScene_1 = __webpack_require__(14);
+	var optionScene_1 = __webpack_require__(16);
 	var OptionSceneMediator = (function (_super) {
 	    __extends(OptionSceneMediator, _super);
 	    function OptionSceneMediator() {
@@ -609,8 +679,8 @@
 	    OptionSceneMediator.prototype.renderScene = function (width, height) {
 	        var self = this;
 	        self.viewComponent = new optionScene_1.OptionScene(width, height);
-	        self.viewComponent.onchange = function (e) {
-	            self.sendNotification(e);
+	        self.viewComponent.onAction = function (action) {
+	            self.sendNotification(puremvc.statemachine.StateMachine.ACTION, null, action);
 	        };
 	    };
 	    OptionSceneMediator.prototype.destroyScene = function () {
@@ -623,8 +693,8 @@
 
 
 /***/ },
-/* 14 */
-/***/ function(module, exports) {
+/* 16 */
+/***/ function(module, exports, __webpack_require__) {
 
 	///<reference path="../../../../../typings/main.d.ts"/>
 	"use strict";
@@ -633,6 +703,7 @@
 	    function __() { this.constructor = d; }
 	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 	};
+	var sceneAction_1 = __webpack_require__(6);
 	var OptionScene = (function (_super) {
 	    __extends(OptionScene, _super);
 	    function OptionScene(width, height) {
@@ -654,8 +725,8 @@
 	        btn.touchEnabled = true;
 	        this.addChild(btn);
 	        btn.addEventListener(egret.TouchEvent.TOUCH_TAP, function (e) {
-	            if (this.onchange) {
-	                this.onchange('Menu');
+	            if (this.onAction) {
+	                this.onAction(sceneAction_1.SceneAction.HOME_ACTION);
 	            }
 	        }, this);
 	    };
@@ -665,7 +736,7 @@
 
 
 /***/ },
-/* 15 */
+/* 17 */
 /***/ function(module, exports, __webpack_require__) {
 
 	///<reference path="../../../../../typings/main.d.ts"/>
@@ -675,7 +746,7 @@
 	    function __() { this.constructor = d; }
 	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 	};
-	var helpScene_1 = __webpack_require__(16);
+	var helpScene_1 = __webpack_require__(18);
 	var HelpSceneMediator = (function (_super) {
 	    __extends(HelpSceneMediator, _super);
 	    function HelpSceneMediator() {
@@ -694,8 +765,8 @@
 	    HelpSceneMediator.prototype.renderScene = function (width, height) {
 	        var self = this;
 	        self.viewComponent = new helpScene_1.HelpScene(width, height);
-	        self.viewComponent.onchange = function (e) {
-	            self.sendNotification(e);
+	        self.viewComponent.onAction = function (action) {
+	            self.sendNotification(puremvc.statemachine.StateMachine.ACTION, null, action);
 	        };
 	    };
 	    HelpSceneMediator.prototype.destroyScene = function () {
@@ -708,8 +779,8 @@
 
 
 /***/ },
-/* 16 */
-/***/ function(module, exports) {
+/* 18 */
+/***/ function(module, exports, __webpack_require__) {
 
 	///<reference path="../../../../../typings/main.d.ts"/>
 	"use strict";
@@ -718,6 +789,7 @@
 	    function __() { this.constructor = d; }
 	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 	};
+	var sceneAction_1 = __webpack_require__(6);
 	var HelpScene = (function (_super) {
 	    __extends(HelpScene, _super);
 	    function HelpScene(width, height) {
@@ -739,8 +811,8 @@
 	        btn.touchEnabled = true;
 	        this.addChild(btn);
 	        btn.addEventListener(egret.TouchEvent.TOUCH_TAP, function (e) {
-	            if (this.onchange) {
-	                this.onchange('Menu');
+	            if (this.onAction) {
+	                this.onAction(sceneAction_1.SceneAction.HOME_ACTION);
 	            }
 	        }, this);
 	    };
@@ -750,7 +822,7 @@
 
 
 /***/ },
-/* 17 */
+/* 19 */
 /***/ function(module, exports, __webpack_require__) {
 
 	///<reference path="../../../../../typings/main.d.ts"/>
@@ -760,82 +832,24 @@
 	    function __() { this.constructor = d; }
 	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 	};
-	var gameMenuCommad_1 = __webpack_require__(18);
-	var gameMainCommad_1 = __webpack_require__(19);
-	var gameOverCommad_1 = __webpack_require__(20);
-	var gameOptionCommad_1 = __webpack_require__(21);
-	var gameHelpCommad_1 = __webpack_require__(22);
+	var injectFSMCommand_1 = __webpack_require__(20);
 	var PrepControllerCommand = (function (_super) {
 	    __extends(PrepControllerCommand, _super);
 	    function PrepControllerCommand() {
 	        _super.call(this);
 	    }
-	    PrepControllerCommand.prototype.execute = function (notification) {
-	        this.facade.registerCommand('Menu', gameMenuCommad_1.GameMenuCommad);
-	        this.facade.registerCommand('GameMain', gameMainCommad_1.GameMainCommad);
-	        this.facade.registerCommand('GameOver', gameOverCommad_1.GameOverCommad);
-	        this.facade.registerCommand('Option', gameOptionCommad_1.GameOptionCommad);
-	        this.facade.registerCommand('Help', gameHelpCommad_1.GameHelpCommad);
+	    PrepControllerCommand.prototype.initializeMacroCommand = function () {
+	        this.addSubCommand(injectFSMCommand_1.InjectFSMCommand);
 	    };
 	    PrepControllerCommand.NAME = 'PREP_CONTROLLER_COMMAND';
 	    return PrepControllerCommand;
-	}(puremvc.SimpleCommand));
+	}(puremvc.MacroCommand));
 	exports.PrepControllerCommand = PrepControllerCommand;
 
 
 /***/ },
-/* 18 */
-/***/ function(module, exports) {
-
-	///<reference path="../../../../../typings/main.d.ts"/>
-	"use strict";
-	var __extends = (this && this.__extends) || function (d, b) {
-	    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-	    function __() { this.constructor = d; }
-	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-	};
-	var GameMenuCommad = (function (_super) {
-	    __extends(GameMenuCommad, _super);
-	    function GameMenuCommad() {
-	        _super.call(this);
-	    }
-	    GameMenuCommad.prototype.execute = function (notification) {
-	        this.sendNotification('CHANGE_SCENE', 'MENU_SCENE_MEDIATOR');
-	    };
-	    GameMenuCommad.NAME = 'GAME_MENU_COMMAND';
-	    return GameMenuCommad;
-	}(puremvc.SimpleCommand));
-	exports.GameMenuCommad = GameMenuCommad;
-
-
-/***/ },
-/* 19 */
-/***/ function(module, exports) {
-
-	///<reference path="../../../../../typings/main.d.ts"/>
-	"use strict";
-	var __extends = (this && this.__extends) || function (d, b) {
-	    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-	    function __() { this.constructor = d; }
-	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-	};
-	var GameMainCommad = (function (_super) {
-	    __extends(GameMainCommad, _super);
-	    function GameMainCommad() {
-	        _super.call(this);
-	    }
-	    GameMainCommad.prototype.execute = function (notification) {
-	        this.sendNotification('CHANGE_SCENE', 'GAME_MAIN_SCENE_MEDIATOR');
-	    };
-	    GameMainCommad.NAME = 'GAME_MAIN_COMMAD';
-	    return GameMainCommad;
-	}(puremvc.SimpleCommand));
-	exports.GameMainCommad = GameMainCommad;
-
-
-/***/ },
 /* 20 */
-/***/ function(module, exports) {
+/***/ function(module, exports, __webpack_require__) {
 
 	///<reference path="../../../../../typings/main.d.ts"/>
 	"use strict";
@@ -844,121 +858,132 @@
 	    function __() { this.constructor = d; }
 	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 	};
-	var GameOverCommad = (function (_super) {
-	    __extends(GameOverCommad, _super);
-	    function GameOverCommad() {
+	var sceneFsm_1 = __webpack_require__(21);
+	var InjectFSMCommand = (function (_super) {
+	    __extends(InjectFSMCommand, _super);
+	    function InjectFSMCommand() {
 	        _super.call(this);
 	    }
-	    GameOverCommad.prototype.execute = function (notification) {
-	        this.sendNotification('CHANGE_SCENE', 'GAME_OVER_SCENE_MEDIATOR');
+	    InjectFSMCommand.prototype.execute = function (notification) {
+	        var sceneFsm = new sceneFsm_1.SceneFsm();
+	        var fsm = sceneFsm.createFsm();
+	        var injector = new puremvc.statemachine.FSMInjector(fsm);
+	        injector.initializeNotifier(this.multitonKey);
+	        injector.inject();
 	    };
-	    GameOverCommad.NAME = 'GAME_OVER_COMMAD';
-	    return GameOverCommad;
+	    InjectFSMCommand.NAME = 'INJECT_FSM_COMMAND';
+	    return InjectFSMCommand;
 	}(puremvc.SimpleCommand));
-	exports.GameOverCommad = GameOverCommad;
+	exports.InjectFSMCommand = InjectFSMCommand;
 
 
 /***/ },
 /* 21 */
-/***/ function(module, exports) {
+/***/ function(module, exports, __webpack_require__) {
 
-	///<reference path="../../../../../typings/main.d.ts"/>
 	"use strict";
-	var __extends = (this && this.__extends) || function (d, b) {
-	    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-	    function __() { this.constructor = d; }
-	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-	};
-	var GameOptionCommad = (function (_super) {
-	    __extends(GameOptionCommad, _super);
-	    function GameOptionCommad() {
-	        _super.call(this);
+	var sceneState_1 = __webpack_require__(22);
+	var sceneAction_1 = __webpack_require__(6);
+	var SceneFsm = (function () {
+	    function SceneFsm() {
 	    }
-	    GameOptionCommad.prototype.execute = function (notification) {
-	        this.sendNotification('CHANGE_SCENE', 'OPTION_SCENE_MEDIATOR');
+	    SceneFsm.prototype.createFsm = function () {
+	        var fsm = {
+	            // 开始状态
+	            "@initial": sceneState_1.SceneState.MENU_MEDIATOR,
+	            "state": [
+	                {
+	                    // Menu
+	                    "@name": sceneState_1.SceneState.MENU_MEDIATOR,
+	                    //"@changed": SceneTransition ,
+	                    "transition": [
+	                        {
+	                            "@action": sceneAction_1.SceneAction.GAME_MAIN_ACTION,
+	                            "@target": sceneState_1.SceneState.GAME_MAIN_MEDIATOR
+	                        },
+	                        {
+	                            "@action": sceneAction_1.SceneAction.OPTION_ACTION,
+	                            "@target": sceneState_1.SceneState.OPTION_MEDIATOR
+	                        },
+	                        {
+	                            "@action": sceneAction_1.SceneAction.HELP_ACTION,
+	                            "@target": sceneState_1.SceneState.HELP_MEDIATOR
+	                        }
+	                    ]
+	                },
+	                {
+	                    // Game
+	                    "@name": sceneState_1.SceneState.GAME_MAIN_MEDIATOR,
+	                    //"@changed": SceneTransition ,
+	                    "transition": [
+	                        {
+	                            "@action": sceneAction_1.SceneAction.GAME_OVER_ACTION,
+	                            "@target": sceneState_1.SceneState.GAME_OVER_MEDIATOR
+	                        },
+	                        {
+	                            "@action": sceneAction_1.SceneAction.HOME_ACTION,
+	                            "@target": sceneState_1.SceneState.MENU_MEDIATOR
+	                        }
+	                    ]
+	                },
+	                {
+	                    // GameOver
+	                    "@name": sceneState_1.SceneState.GAME_OVER_MEDIATOR,
+	                    //"@changed": SceneTransition ,
+	                    "transition": [
+	                        {
+	                            "@action": sceneAction_1.SceneAction.HOME_ACTION,
+	                            "@target": sceneState_1.SceneState.MENU_MEDIATOR
+	                        }
+	                    ]
+	                },
+	                {
+	                    // Option
+	                    "@name": sceneState_1.SceneState.OPTION_MEDIATOR,
+	                    //"@changed": SceneTransition ,
+	                    "transition": [
+	                        {
+	                            "@action": sceneAction_1.SceneAction.HOME_ACTION,
+	                            "@target": sceneState_1.SceneState.MENU_MEDIATOR
+	                        }
+	                    ]
+	                },
+	                {
+	                    // Help
+	                    "@name": sceneState_1.SceneState.HELP_MEDIATOR,
+	                    //"@changed": SceneTransition ,
+	                    "transition": [
+	                        {
+	                            "@action": sceneAction_1.SceneAction.HOME_ACTION,
+	                            "@target": sceneState_1.SceneState.MENU_MEDIATOR
+	                        }
+	                    ]
+	                }
+	            ]
+	        };
+	        return fsm;
 	    };
-	    GameOptionCommad.NAME = 'GAME_OPTION_COMMAND';
-	    return GameOptionCommad;
-	}(puremvc.SimpleCommand));
-	exports.GameOptionCommad = GameOptionCommad;
+	    return SceneFsm;
+	}());
+	exports.SceneFsm = SceneFsm;
 
 
 /***/ },
 /* 22 */
 /***/ function(module, exports) {
 
-	///<reference path="../../../../../typings/main.d.ts"/>
 	"use strict";
-	var __extends = (this && this.__extends) || function (d, b) {
-	    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-	    function __() { this.constructor = d; }
-	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-	};
-	var GameHelpCommad = (function (_super) {
-	    __extends(GameHelpCommad, _super);
-	    function GameHelpCommad() {
-	        _super.call(this);
+	var SceneState = (function () {
+	    function SceneState() {
 	    }
-	    GameHelpCommad.prototype.execute = function (notification) {
-	        this.sendNotification('CHANGE_SCENE', 'HELP_SCENE_MEDIATOR');
-	    };
-	    GameHelpCommad.NAME = 'GAME_HELP_COMMAD';
-	    return GameHelpCommad;
-	}(puremvc.SimpleCommand));
-	exports.GameHelpCommad = GameHelpCommad;
-
-
-/***/ },
-/* 23 */
-/***/ function(module, exports) {
-
-	///<reference path="../../../../../typings/main.d.ts"/>
-	"use strict";
-	var __extends = (this && this.__extends) || function (d, b) {
-	    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-	    function __() { this.constructor = d; }
-	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-	};
-	var DirectorMediator = (function (_super) {
-	    __extends(DirectorMediator, _super);
-	    function DirectorMediator() {
-	        _super.call(this, DirectorMediator.NAME);
-	    }
-	    /** @override */
-	    DirectorMediator.prototype.listNotificationInterests = function () {
-	        return ['CHANGE_SCENE'];
-	    };
-	    DirectorMediator.prototype.handleNotification = function (notification) {
-	        switch (notification.getName()) {
-	            case 'CHANGE_SCENE':
-	                //alert('CHANGE_SCENE');
-	                //alert(notification.getBody());
-	                this.changeScene(notification.getBody());
-	                break;
-	        }
-	    };
-	    DirectorMediator.prototype.onRegister = function () {
-	        var sprite = new egret.Sprite();
-	        this.setViewComponent(sprite);
-	    };
-	    DirectorMediator.prototype.onRemove = function () {
-	    };
-	    DirectorMediator.prototype.changeScene = function (mediatorName) {
-	        if (this._activeSceneMediator) {
-	            this.getViewComponent().removeChildren();
-	            this._activeSceneMediator.destroyScene();
-	        }
-	        var sceneMediator = this.facade.retrieveMediator(mediatorName);
-	        if (sceneMediator) {
-	            this._activeSceneMediator = sceneMediator;
-	            sceneMediator.renderScene(this.getViewComponent().width, this.getViewComponent().height);
-	            this.getViewComponent().addChild(sceneMediator.getViewComponent());
-	        }
-	    };
-	    DirectorMediator.NAME = 'DIRECTOR_MEDIATOR';
-	    return DirectorMediator;
-	}(puremvc.Mediator));
-	exports.DirectorMediator = DirectorMediator;
+	    SceneState.MENU_MEDIATOR = 'MENU_SCENE_MEDIATOR';
+	    SceneState.GAME_MAIN_MEDIATOR = 'GAME_MAIN_SCENE_MEDIATOR';
+	    SceneState.GAME_OVER_MEDIATOR = 'GAME_OVER_SCENE_MEDIATOR';
+	    SceneState.OPTION_MEDIATOR = 'OPTION_SCENE_MEDIATOR';
+	    SceneState.HELP_MEDIATOR = 'HELP_SCENE_MEDIATOR';
+	    return SceneState;
+	}());
+	exports.SceneState = SceneState;
 
 
 /***/ }

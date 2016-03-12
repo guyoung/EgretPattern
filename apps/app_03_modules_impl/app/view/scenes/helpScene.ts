@@ -16,13 +16,13 @@ export class HelpScene extends egret.Sprite {
     private init() {
 
         var text = new egret.TextField();
-        text.text = '帮助界面';
+        text.text = ' Help Scene ';
         text.x = (this.width - text.width) * 0.5;
         text.y = 200;
         this.addChild(text);
 
         var btn = new egret.TextField();
-        btn.text = '退出';
+        btn.text = 'EXIT';
         btn.x = this.width - 20 - btn.width;
         btn.y = this.height - 20 - btn.height;
         btn.touchEnabled = true;
