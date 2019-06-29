@@ -1,4 +1,4 @@
-GyEgretPattern
+EgretPattern
 ==============
 Egret应用开发实践
 
